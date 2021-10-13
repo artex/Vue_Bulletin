@@ -11,6 +11,9 @@ export default new Vuex.Store({
     state: {
         user: null,
         users: null,
+        photofile: [],
+        confirm: "",
+        noti: "",
     },
     mutations: {
         setUserData(state, userData) {
@@ -18,11 +21,19 @@ export default new Vuex.Store({
         },
         setUsersData(state, usersData) {
             state.users = usersData
-        }
+        },
+        storeFile(state, fileData) {
+            state.photofile = fileData
+        },
+        confirmPassword(state, confirmPassword) {
+            state.confirm = confirmPassword
+        },
+        notification(state, notification) {
+            state.noti = notification
+        },
     },
     actions: {
         confirmUser({ commit }, usersData) {
-
             return axios.post("/user/confirm", usersData).then((data) => {
                 commit("setUsersData", usersData)
                 console.log(data)
@@ -30,8 +41,19 @@ export default new Vuex.Store({
                 console.log(err.response.data)
             })
         },
+        confirmPassword({ commit }, confirmPassword) {
+            commit("confirmPassword", confirmPassword)
+        },
+        createUsers({ commit }, createUsers) {
+            return axios.post("/user/create", createUsers).then((data) => {
+                console.log(data)
+                commit("notification", data)
+                commit("setUsersData", null)
+                commit("confirmPassword", null)
+                commit("storeFile", null)
+            })
+        },
         login({ commit }, credentials) {
-            // console.log(credentials)
             return axios.post("/auth/login", credentials).then(({ data }) => {
                 commit("setUserData", data);
                 console.log(data)
@@ -41,7 +63,12 @@ export default new Vuex.Store({
             commit("setUserData", null);
         },
 
-
+        filestore({ commit }, file) {
+            commit("storeFile", file)
+        },
+        cancelAlert({ commit }) {
+            commit("notification", null)
+        },
     },
     getters: {
         isLoggedIn: (state) => !!state.user,

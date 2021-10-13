@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <h1 class="header">Register</h1>
+    <h1 class="header">Profile Edit</h1>
     <v-form
       ref="form"
       v-model="valid"
-      @submit.prevent="createUser"
+      @submit.prevent="editProfile"
       lazy-validation
     >
       <v-card class="mx-auto px-14 py-8 card">
@@ -23,29 +23,6 @@
           required
           :rules="emailRules"
           type="email"
-        ></v-text-field>
-
-        <v-text-field
-          v-model="users.password"
-          :counter="100"
-          label="Password"
-          type="password"
-          required
-          :rules="passRules"
-        ></v-text-field>
-        <div
-          v-if="this.confirm && this.confirm != this.users.password"
-          class="errMsg"
-        >
-          {{ this.errorConfirm }}
-        </div>
-        <v-text-field
-          v-model="confirm"
-          :counter="100"
-          label="Password Confirmation"
-          :rules="cpassRules"
-          type="password"
-          required
         ></v-text-field>
 
         <v-select :items="items" v-model="users.role" label="User"></v-select>
@@ -102,13 +79,18 @@
           label="Address"
           auto-grow
         ></v-textarea>
-
+        <div>
+          <img
+            v-if="this.image"
+            :src="this.image"
+            alt=""
+            style="width: 250px"
+          />
+        </div>
         <v-file-input
           v-model="users.profile"
-          label="upload Profile"
+          label="upload New Profile"
           prepend-icon="mdi-camera"
-          :rules="profileRules"
-          @change="addFile"
         ></v-file-input>
       </v-card>
 
@@ -119,7 +101,7 @@
         <v-btn
           type="submit"
           @click="validate"
-          :disabled="!valid || this.confirm != this.users.password"
+          :disabled="!valid"
           color="#198754"
           class="mr-4"
           style="color: white"
@@ -132,6 +114,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import constant from "../../constants";
 import { mapGetters } from "vuex";
 export default {
@@ -153,6 +136,7 @@ export default {
       deleted_user_id: "",
       deleted_at: "",
     },
+    image: null,
     confirm: "",
     errorConfirm: null,
     items: ["Admin", "User"],
@@ -190,25 +174,29 @@ export default {
         !!v == constant.VALIDATION.PROFILE.REQUIRE || "Profile is required",
     ],
   }),
-  updated() {
-    if (this.confirm != this.users.password) {
-      this.errorConfirm = "Password and Confirm Password Must be same";
-    }
-  },
   computed: {
     ...mapGetters(["userId", "userType", "userName"]),
+    editprofileData() {
+      return this.$store.state.user.user;
+    },
   },
-  created(){
-    if (this.$store.state.users) {
-      if (this.$store.state.users.role === 0) {
-        this.users = this.$store.state.users
-        this.users.role = "Admin"
-        console.log(this.users.role)
-      }else{
-        this.users = this.$store.state.users
-        this.users.role = "User"
+  created() {
+      console.log(this.$store.state.user)
+    axios
+      .get(`/detail?id=${this.$store.state.user.user.id}`)
+      .then((data) => {
+        this.image = data.data.image;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    if (this.editprofileData) {
+      this.users = this.editprofileData;
+      if (this.users.role === 0) {
+        this.users.role = "Admin";
+      } else {
+        this.users.role = "User";
       }
-      this.confirm = this.$store.state.confirm
     }
   },
   methods: {
@@ -219,7 +207,7 @@ export default {
       } else {
         this.users.role = 1;
       }
-      this.$store.dispatch("confirmPassword", this.confirm)
+      this.$store.dispatch("confirmPassword", this.confirm);
       this.$store.dispatch("confirmUser", this.users).then(() => {
         this.$router.push({
           name: "confirm",
@@ -227,25 +215,8 @@ export default {
       });
     },
 
-    addFile(file) {
-      if (file) {
-        if (file.size > constant.VALIDATION.PROFILE.MAX) {
-          this.errImg = "Image size too big!! Maximum is 2MB ";
-        } else {
-          const reader = new FileReader();
-          reader.addEventListener("load", (event) =>
-            this.$store.dispatch("filestore", event.target.result)
-          );
-          reader.addEventListener(
-            "error",
-            () => (this.previews = this.errorImage)
-          );
-          reader.readAsDataURL(file);
-        }
-      } else {
-        this.$store.dispatch("filestore", null);
-        this.errImg = null;
-      }
+    editProfile() {
+        console.log(this.users)
     },
 
     validate() {
