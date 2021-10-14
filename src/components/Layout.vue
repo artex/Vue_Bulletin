@@ -13,7 +13,7 @@
                     <v-toolbar-title class="toolbar">
                         <span v-if="this.$store.state.user" >
                             
-                                <span v-if="userType==0" class="title3">
+                                <span v-if="userType == 0 || userType === `Admin`" class="title3">
                                     <router-link :to="{ name: 'list' }" class="link">
                                     Users
                                     </router-link>

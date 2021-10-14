@@ -88,15 +88,16 @@
           />
         </div>
         <v-file-input
-          v-model="users.profile"
+          v-model="profile"
           label="upload New Profile"
           prepend-icon="mdi-camera"
+          @change="changeProfile"
         ></v-file-input>
       </v-card>
 
       <div class="btn">
-        <v-btn color="error" class="mr-4" @click="reset">
-          Reset
+        <v-btn color="error" class="mr-4" >
+          Clear
         </v-btn>
         <v-btn
           type="submit"
@@ -106,7 +107,7 @@
           class="mr-4"
           style="color: white"
         >
-          Register
+          Edit
         </v-btn>
       </div>
     </v-form>
@@ -136,6 +137,7 @@ export default {
       deleted_user_id: "",
       deleted_at: "",
     },
+    profile: null,
     image: null,
     confirm: "",
     errorConfirm: null,
@@ -181,56 +183,59 @@ export default {
     },
   },
   created() {
-      console.log(this.$store.state.user)
+    console.log(this.$store.state.user);
     axios
       .get(`/detail?id=${this.$store.state.user.user.id}`)
       .then((data) => {
         this.image = data.data.image;
+        this.users = data.data.user
+        if (this.users.role === 0) {
+          this.users.role = "Admin";
+        } else {
+          this.users.role = "User";
+        }
       })
       .catch((err) => {
         console.log(err);
       });
-    if (this.editprofileData) {
-      this.users = this.editprofileData;
-      if (this.users.role === 0) {
-        this.users.role = "Admin";
-      } else {
-        this.users.role = "User";
-      }
-    }
   },
   methods: {
-    createUser() {
-      this.users.create_user_id = this.userId;
-      if (this.users.role === "Admin") {
-        this.users.role = 0;
-      } else {
-        this.users.role = 1;
-      }
-      this.$store.dispatch("confirmPassword", this.confirm);
-      this.$store.dispatch("confirmUser", this.users).then(() => {
-        this.$router.push({
-          name: "confirm",
-        });
-      });
+    changeProfile() {
+      this.users.profile = this.profile;
     },
-
     editProfile() {
-        console.log(this.users)
+      this.users.update_user_id = this.editprofileData.id
+      if(this.users.role==="Admin"){
+        this.users.role = 0
+      }else{
+        this.users.role = 1
+      }
+      if (this.users.profile.name) {
+        const formData = new FormData();
+        formData.append("filename", this.users.profile);
+        Object.entries(this.users).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
+        formData.append(
+          "profile",
+          this.users.profile.name
+        );
+        this.$store.dispatch("editProfile", formData)
+          .then(() => {
+            this.$router.push({ name: "list" });
+          })
+      } else {
+        this.$store.dispatch("editProfile",
+            this.users
+          )
+          .then(() => {
+            this.$router.push({ name: "list" });
+          })
+      }
     },
 
     validate() {
       this.$refs.form.validate();
-    },
-    reset() {
-      var self = this;
-      Object.keys(this.users).forEach(function(key) {
-        self.user[key] = "";
-      });
-      this.users = null;
-      this.confirm = null;
-      this.errorConfirm = "";
-      this.$refs.form.reset();
     },
   },
 };

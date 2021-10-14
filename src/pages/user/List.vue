@@ -5,14 +5,22 @@
       {{ this.$store.state.noti.data.data }}
       <button class="cross-btn" @click="cancelAlert">X</button>
     </v-alert>
+    <v-alert v-if="this.$store.state.editnoti" type="success">
+      {{ this.$store.state.editnoti.data.data }}
+      <button class="cross-btn" @click="cancelAlert2">X</button>
+    </v-alert>
+    <v-alert v-if="this.noti!=null" type="success">
+      {{ this.noti }}
+      <button class="cross-btn" @click="cancelAlert3">X</button>
+    </v-alert>
     <v-card-title>
       <v-spacer></v-spacer>
-      <v-form ref="form">
+      <v-form ref="form" @submit.prevent="filtername">
         <v-row class="filter-bar">
           <v-col md="2.5">
             <v-text-field
               label="Name"
-              @change="filterUsers"
+              v-model="keyword"
               hide-details="auto"
             >
             </v-text-field>
@@ -20,49 +28,187 @@
           <v-col md="2.5">
             <v-text-field
               label="Email"
-              @change="filterUsers"
+              v-model="ekeyword"
               hide-details="auto"
             >
             </v-text-field>
           </v-col>
-          <v-btn class="post-list-btn mr-4" color="primary">Search</v-btn>
+          <v-btn type="submit" class="post-list-btn mr-4" color="primary">Search</v-btn>
         </v-row>
       </v-form>
     </v-card-title>
     <v-container>
       <v-flex style="overflow: auto">
-        <v-data-table :headers="headers" :items="showList">
+        <v-data-table
+          :headers="headers"
+          :items="showList"
+          :image="image"
+          :role="role"
+        >
           <template v-slot:[`item.name`]="{ item }">
-            <router-link
-              :to="`/applicants/${item.id}`"
-              :key="item.id"
-              v-if="item.name"
-              >{{ item.name }}</router-link
-            >
+            <template>
+              <v-row justify="space-around">
+                <v-col cols="auto">
+                  <v-dialog
+                    transition="dialog-bottom-transition"
+                    max-width="700"
+                    heigit="90vh"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <a
+                        color="primary"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="getImage(item.id)"
+                        >{{ item.name }}</a
+                      >
+                    </template>
+                    <template v-slot:default="dialog">
+                      <v-card>
+                        <v-toolbar color="primary" dark>User Detail</v-toolbar>
+                        <v-card-text class="clearFix">
+                          <div class="left clearFix">
+                            <img :src="image" style="width: 150px" alt="" />
+                          </div>
+                          <div class="right clearFix">
+                            <div class="right-left">
+                              <h2>name</h2>
+                              <h2>Type</h2>
+                              <h2>email</h2>
+                              <h2>Phone</h2>
+                              <h2>Date Of Birth</h2>
+                              <h2>Address</h2>
+                              <h2>Created Date</h2>
+                              <h2>Created User</h2>
+                              <h2>Updated Date</h2>
+                              <h2>Updated User</h2>
+                            </div>
+                            <div class="right-right">
+                              <h3>{{ item.name }}</h3>
+                              <h3>{{ role }}</h3>
+                              <h3>{{ item.email }}</h3>
+                              <h3>{{ item.phone }}</h3>
+                              <h3>{{ item.dob }}</h3>
+                              <h3>{{ item.address }}</h3>
+                              <h3>{{ item.created_at }}</h3>
+                              <h3>{{ item.create_user_id }}</h3>
+                              <h3>{{ item.updated_at }}</h3>
+                              <h3>{{ item.update_user_id }}</h3>
+                              <!-- <h3>{{item.role}}</h3> -->
+                            </div>
+                          </div>
+                        </v-card-text>
+                        <v-card-actions class="justify-end">
+                          <v-btn text @click="dialog.value = false"
+                            >Close</v-btn
+                          >
+                        </v-card-actions>
+                      </v-card>
+                    </template>
+                  </v-dialog>
+                </v-col>
+              </v-row>
+            </template>
           </template>
-          
-          <template  v-slot:[`item.create_user_id`]="{ item }">
+
+          <template v-slot:[`item.create_user_id`]="{ item }">
             <div>
-              {{  item.create_user_id }}
+              {{ item.create_user_id }}
             </div>
           </template>
           <template v-slot:[`item.role`]="{ item }">
-            <div v-if="item.role===0">
+            <div v-if="item.role === 0">
               Admin
             </div>
-            <div v-if="item.role===1">
+            <div v-if="item.role === 1">
               User
             </div>
           </template>
           <template v-slot:[`item.operation`]="{ item }">
             <v-row>
               <div class="operation-btn">
-                <v-btn
+                <!-- <v-btn
                   color="error"
-                  @click="deleteApplicant(item.id)"
+                  @click="deleteUser(item)"
                   class="post-list-btn"
                   >Delete</v-btn
-                >
+                > -->
+                <template>
+                  <v-row justify="space-around">
+                    <v-col cols="auto">
+                      <v-dialog
+                        transition="dialog-bottom-transition"
+                        max-width="600"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <!-- <btn
+                            color="primary"
+                            v-bind="attrs"
+                            v-on="on"
+                            @click="getImage(item.id)"
+                            >{{ item.name }}</btn
+                          > -->
+                          <v-btn
+                            v-bind="attrs"
+                            v-on="on"
+                            color="error"
+                            class="post-list-btn"
+                            @click="getImage(item.id)"
+                            >Delete</v-btn
+                          >
+                        </template>
+                        <template v-slot:default="dialog">
+                          <v-card>
+                            <v-toolbar color="primary" dark
+                              >Delete Confirm</v-toolbar
+                            >
+                            <div style="color: red; margin: 20px; font-size:20px">
+                              Are you sure to delete user?
+                            </div>
+                            <v-card-text class="clearFix">
+                              <div class="right1 clearFix">
+                                <div class="right-left1">
+                                  <h2>ID</h2>
+                                  <h2>name</h2>
+                                  <h2>Type</h2>
+                                  <h2>email</h2>
+                                  <h2>Phone</h2>
+                                  <h2>Date Of Birth</h2>
+                                  <h2>Address</h2>
+                                </div>
+                                <div class="right-right1">
+                                  <h3>{{ item.id }}</h3>
+                                  <h3>{{ item.name }}</h3>
+                                  <h3>{{ role }}</h3>
+                                  <h3>{{ item.email }}</h3>
+                                  <h3>{{ item.phone }}</h3>
+                                  <h3>{{ item.dob }}</h3>
+                                  <h3>{{ item.address }}</h3>
+                                </div>
+                              </div>
+                            </v-card-text>
+                            <v-card-actions class="justify-end">
+                              <v-btn
+                                text
+                                @click="dialog.value = false"
+                                style="background: #6C757D; color:white;"
+                                >Close</v-btn
+                              >
+                              <v-btn
+                                text
+                                @click="
+                                  deleteUser(item), (dialog.value = false)
+                                "
+                                style="background: #FF6060; color: white;"
+                                >Delete</v-btn
+                              >
+                            </v-card-actions>
+                          </v-card>
+                        </template>
+                      </v-dialog>
+                    </v-col>
+                  </v-row>
+                </template>
               </div>
             </v-row>
           </template>
@@ -74,13 +220,12 @@
 
 <script>
 import { mapGetters } from "vuex";
+import axios from "axios";
 export default {
   data() {
     return {
       postInfo: null,
-      dialogTitle: "",
       dialog: false,
-      isDeleteDialog: false,
       headerList: [
         {
           text: "ID",
@@ -130,6 +275,14 @@ export default {
       ],
       userList: [],
       showList: [],
+      users: {
+        id: "",
+      },
+      image: null,
+      role: "",
+      keyword: null,
+      ekeyword: null,
+      noti: null,
     };
   },
   computed: {
@@ -141,6 +294,24 @@ export default {
         return this.headerList;
       }
     },
+    currentDateTime() {
+      const current = new Date();
+      const date =
+        current.getFullYear() +
+        "-" +
+        (current.getMonth() + 1) +
+        "-" +
+        current.getDate();
+      const time =
+        current.getHours() +
+        ":" +
+        current.getMinutes() +
+        ":" +
+        current.getSeconds();
+      const dateTime = date + " " + time;
+
+      return dateTime;
+    },
   },
   mounted() {
     this.$axios
@@ -148,24 +319,61 @@ export default {
       .then((response) => {
         this.userList = response.data;
         this.showList = this.userList;
-        console.log(response)
       })
       .catch((err) => {
         console.log(err);
       });
   },
   methods: {
+    getImage(iddata) {
+      this.users.id = iddata;
+      axios.put(`/user/get`, this.users).then((data) => {
+        this.image = data.data.image;
+        this.role = data.data.role;
+        if (this.role === 0) {
+          this.role = "Admin";
+        } else {
+          this.role = "User";
+        }
+      });
+    },
     cancelAlert() {
       this.$store.state.noti = false;
       this.$store.dispatch("cancelAlert");
     },
-    filterUsers() {
+    cancelAlert2() {
+      this.$store.state.editnoti = false;
+      this.$store.dispatch("cancelAlert2");
+    },
+    cancelAlert3() {
+      this.noti = null;
+    },
+    filtername() {
       this.showList = this.userList.filter((user) => {
         return (
-          user.title.includes(this.keyword) ||
-          user.description.includes(this.keyword) ||
-          user.created_user.includes(this.keyword)
+          user.name.includes(this.keyword)&&
+          user.email.includes(this.ekeyword)
         );
+      });
+    },
+
+    deleteUser(item) {
+      item.deleted_user_id = this.$store.state.user.user.id;
+      item.deleted_at = new Date()
+        .toJSON()
+        .slice(0, 10)
+        .replace(/-/g, "/");
+      return axios.put("/user/delete", item).then((data) => {
+        this.noti = data.data.data
+        this.$axios
+          .get("/user/list")
+          .then((response) => {
+            this.userList = response.data;
+            this.showList = this.userList;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       });
     },
   },
@@ -173,6 +381,14 @@ export default {
 </script>
 
 <style scoped>
+.clearFix:after {
+  content: "";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  font-size: 0;
+  height: 0;
+}
 .header {
   background: #198754;
   color: white;
@@ -181,5 +397,49 @@ export default {
 }
 .cross-btn {
   float: right;
+}
+.left {
+  margin-top: 15px;
+  float: left;
+  width: 25%;
+}
+.left img {
+  border-radius: 60%;
+  height: 150px;
+}
+.right {
+  margin-top: 15px;
+  float: right;
+  width: 70%;
+}
+.right-left,
+.right-left1 {
+  float: left;
+  width: 35%;
+}
+.right-right,
+.right-right1 {
+  float: left;
+  width: 65%;
+}
+.right-left h2,
+.right-left1 h2 {
+  margin-top: 10px;
+  height: 25px;
+}
+.right-right h3,
+.right-right1 h3 {
+  margin-top: 10px;
+  height: 25px;
+}
+.right1 {
+  width: 80%;
+  margin: 0 auto;
+}
+.right-left1 {
+  width: 50%;
+}
+.right-right1 {
+  width: 50%;
 }
 </style>

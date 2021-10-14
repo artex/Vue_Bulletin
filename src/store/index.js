@@ -14,10 +14,14 @@ export default new Vuex.Store({
         photofile: [],
         confirm: "",
         noti: "",
+        editnoti: "",
     },
     mutations: {
         setUserData(state, userData) {
             state.user = userData;
+        },
+        setUserData1(state, userData) {
+            state.user.user.role = userData;
         },
         setUsersData(state, usersData) {
             state.users = usersData
@@ -31,6 +35,9 @@ export default new Vuex.Store({
         notification(state, notification) {
             state.noti = notification
         },
+        editnoti(state, editnoti) {
+            state.editnoti = editnoti
+        }
     },
     actions: {
         confirmUser({ commit }, usersData) {
@@ -53,6 +60,13 @@ export default new Vuex.Store({
                 commit("storeFile", null)
             })
         },
+        editProfile({ commit }, editprofileData) {
+            return axios.put(`/update?${this.state.user.user.id}`, editprofileData).then((data) => {
+                commit("editnoti", data)
+                commit("setUserData1", editprofileData.role)
+            })
+
+        },
         login({ commit }, credentials) {
             return axios.post("/auth/login", credentials).then(({ data }) => {
                 commit("setUserData", data);
@@ -68,6 +82,9 @@ export default new Vuex.Store({
         },
         cancelAlert({ commit }) {
             commit("notification", null)
+        },
+        cancelAlert2({ commit }) {
+            commit("editnoti", null)
         },
     },
     getters: {
