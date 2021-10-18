@@ -8,8 +8,10 @@
                 <v-col md="2.5">
                     <v-text-field label="Search keyword" hide-details="auto"></v-text-field>
                 </v-col>
-                <v-btn class="post-list-btn mr-4" color="primary">Filter</v-btn>
-                <v-btn class="post-list-btn mr-4" color="primary">Create</v-btn>
+                <v-btn class="post-list-btn mr-4" color="primary">Search</v-btn>
+                <v-btn class="post-list-btn mr-4" color="primary">
+                    <router-link :to="{ name: 'post-create' }" class="link">Create</router-link>
+                </v-btn>
                 <v-btn class="post-list-btn mr-4" color="primary">Upload</v-btn>
                 <v-btn class="post-list-btn mr-4" color="primary">Download</v-btn>
             </v-row>
@@ -19,6 +21,9 @@
         <v-data-table :headers="headers" :items="showList">
             <template v-slot:[`item.title`]="{ item }">
                 <a v-if="item.title">{{item.title}}</a>
+            </template>
+            <template v-slot:[`item.created_at`]="{ item }">
+                {{item.created_date}}
             </template>
             <template v-slot:[`item.operation`]>
                 <v-row>

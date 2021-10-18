@@ -6,6 +6,7 @@ import Confirm from "../pages/user/Confirm";
 import Profile from "../pages/user/Profile";
 import Create from "../pages/user/Create";
 import Profile_edit from "../pages/user/Profile_edit";
+import Post_Create from "../pages/post/Create";
 import List from "../pages/user/List";
 import PostList from "../pages/post/PostList";
 import store from "../store";
@@ -48,6 +49,11 @@ const routes = [{
         component: Profile_edit,
     },
     {
+        path: "/post-create",
+        name: "post-create",
+        component: Post_Create,
+    },
+    {
         path: "/*",
         redirect: "/post/list",
     },
@@ -63,7 +69,7 @@ const router = new VueRouter({
  */
 router.beforeEach((to, from, next) => {
     const loggedIn = store.getters.isLoggedIn;
-    if (!loggedIn && to.name != "login" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile") {
+    if (!loggedIn && to.name != "login" && to.name != "post-list" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile" && to.name != "post-create") {
         return next("/login");
     }
     next();

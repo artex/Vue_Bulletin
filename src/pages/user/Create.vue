@@ -214,6 +214,7 @@ export default {
   methods: {
     createUser() {
       this.users.create_user_id = this.userId;
+      this.users.update_user_id = this.userId;
       if (this.users.role === "Admin") {
         this.users.role = 0;
       } else {

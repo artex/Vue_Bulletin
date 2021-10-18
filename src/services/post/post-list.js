@@ -6,8 +6,7 @@ export default {
             dialogTitle: "",
             dialog: false,
             isDeleteDialog: false,
-            headerList: [
-                {
+            headerList: [{
                     text: "ID",
                     align: "start",
                     value: "id",
@@ -22,7 +21,11 @@ export default {
                 },
                 {
                     text: "Posted User",
-                    value: "created_user",
+                    value: "create_user",
+                },
+                {
+                    text: "Posted Date",
+                    value: "created_at",
                 },
                 {
                     text: "Operation",

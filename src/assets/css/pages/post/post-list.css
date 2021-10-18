@@ -7,7 +7,7 @@
 }
 
 .post-list-btn:hover {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 .operation-btn {
@@ -15,5 +15,10 @@
 }
 
 .detail-row {
-  height: 30px;
+    height: 30px;
+}
+
+.link {
+    color: #FFF;
+    text-decoration: none;
 }

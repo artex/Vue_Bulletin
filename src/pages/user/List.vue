@@ -91,9 +91,9 @@
                               <h3>{{ item.dob }}</h3>
                               <h3>{{ item.address }}</h3>
                               <h3>{{ item.created_at }}</h3>
-                              <h3>{{ item.create_user_id }}</h3>
+                              <h3>{{ item.user_name }}</h3>
                               <h3>{{ item.updated_at }}</h3>
-                              <h3>{{ item.update_user_id }}</h3>
+                              <h3>{{ item.update_name }}</h3>
                               <!-- <h3>{{item.role}}</h3> -->
                             </div>
                           </div>
@@ -109,12 +109,6 @@
                 </v-col>
               </v-row>
             </template>
-          </template>
-
-          <template v-slot:[`item.create_user_id`]="{ item }">
-            <div>
-              {{ item.create_user_id }}
-            </div>
           </template>
           <template v-slot:[`item.role`]="{ item }">
             <div v-if="item.role === 0">
@@ -242,7 +236,7 @@ export default {
         },
         {
           text: "Created User",
-          value: "create_user_id",
+          value: "user_name",
         },
         {
           text: "Type",
@@ -351,7 +345,7 @@ export default {
     filtername() {
       this.showList = this.userList.filter((user) => {
         return (
-          user.name.includes(this.keyword)&&
+          user.name.includes(this.keyword)||
           user.email.includes(this.ekeyword)
         );
       });
