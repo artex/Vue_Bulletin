@@ -7,6 +7,9 @@ import Profile from "../pages/user/Profile";
 import Create from "../pages/user/Create";
 import Profile_edit from "../pages/user/Profile_edit";
 import Post_Create from "../pages/post/Create";
+import Post_Confirm from "../pages/post/Confirm";
+import Confirm_Edit from "../pages/post/EditConfirm";
+import Post_Edit from "../pages/post/Edit";
 import List from "../pages/user/List";
 import PostList from "../pages/post/PostList";
 import store from "../store";
@@ -54,6 +57,21 @@ const routes = [{
         component: Post_Create,
     },
     {
+        path: "/post-confirm",
+        name: "post-confirm",
+        component: Post_Confirm,
+    },
+    {
+        path: "/post-edit/:id",
+        name: "post-edit",
+        component: Post_Edit,
+    },
+    {
+        path: "/confirm-edit",
+        name: "confirm-edit",
+        component: Confirm_Edit,
+    },
+    {
         path: "/*",
         redirect: "/post/list",
     },
@@ -69,7 +87,7 @@ const router = new VueRouter({
  */
 router.beforeEach((to, from, next) => {
     const loggedIn = store.getters.isLoggedIn;
-    if (!loggedIn && to.name != "login" && to.name != "post-list" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile" && to.name != "post-create") {
+    if (!loggedIn && to.name != "post-confirm" && to.name != "confirm-edit" && to.name != "post-edit" && to.name != "login" && to.name != "post-list" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile" && to.name != "post-create") {
         return next("/login");
     }
     next();

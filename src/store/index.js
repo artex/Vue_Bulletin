@@ -6,7 +6,7 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER;
-
+import router from "../router"
 export default new Vuex.Store({
     state: {
         user: null,
@@ -15,6 +15,11 @@ export default new Vuex.Store({
         confirm: "",
         noti: "",
         editnoti: "",
+        posts: null,
+        postnoti: "",
+        editpost: null,
+        error: null,
+        posterror: null
     },
     mutations: {
         setUserData(state, userData) {
@@ -37,6 +42,24 @@ export default new Vuex.Store({
         },
         editnoti(state, editnoti) {
             state.editnoti = editnoti
+        },
+        setPostsData(state, postsData) {
+            state.posts = postsData
+        },
+        postnoti(state, postnoti) {
+            state.postnoti = postnoti
+        },
+        editPost(state, edit) {
+            state.editpost = edit
+        },
+        editerror(state, editerror) {
+            state.error = editerror
+        },
+        clearError(state) {
+            state.error = null
+        },
+        posterror(state, error) {
+            state.posterror = error
         }
     },
     actions: {
@@ -86,6 +109,46 @@ export default new Vuex.Store({
         cancelAlert2({ commit }) {
             commit("editnoti", null)
         },
+        confirmPost({ commit }, postsData) {
+            return axios.post("/post/confirm", postsData).then(() => {
+                commit("setPostsData", postsData)
+                router.push({ name: "post-confirm" })
+            }).catch((error) => {
+                console.log(error.response.data)
+                commit("posterror", error.response.data)
+            })
+        },
+        createPosts({ commit }, createPost) {
+            return axios.post("/post/create", createPost).then((data) => {
+                commit("postnoti", data)
+                commit("setPostsData", null)
+            })
+        },
+        postcancelAlert({ commit }) {
+            commit("postnoti", null)
+        },
+        editPost({ commit }, editPost) {
+            return axios.put("/post/edit", editPost)
+                .then((data) => {
+                    console.log(data)
+                    commit("editPost", editPost)
+                    router.push({ name: "confirm-edit" })
+                }).catch(err => {
+                    console.log(err.response.data)
+                    commit("editerror", err.response.data)
+                })
+        },
+        clearError({ commit }) {
+            commit("clearError", null)
+            commit("posterror", null)
+        },
+        updatePost({ commit }, updateData) {
+            return axios.put("/post/update", updateData).then((data) => {
+                commit("postnoti", data)
+                commit("editPost", null)
+                router.push({ name: "post-list" })
+            })
+        }
     },
     getters: {
         isLoggedIn: (state) => !!state.user,

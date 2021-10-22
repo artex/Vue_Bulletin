@@ -1,4 +1,5 @@
 import { mapGetters } from "vuex";
+import axios from "axios";
 export default {
     data() {
         return {
@@ -34,6 +35,8 @@ export default {
             ],
             postList: [],
             showList: [],
+            noti: null,
+            keyword: "",
         };
     },
     computed: {
@@ -65,10 +68,35 @@ export default {
         filterPosts() {
             this.showList = this.postList.filter((post) => {
                 return (
-                    post.title.includes(this.keyword) ||
-                    post.description.includes(this.keyword) ||
-                    post.created_user.includes(this.keyword)
+                    post.title.includes(this.keyword)
                 );
+            });
+        },
+        cancelAlert() {
+            this.$store.state.postnoti = false;
+            this.$store.dispatch("postcancelAlert");
+        },
+        cancelAlert3() {
+            this.noti = null;
+        },
+        deletePost(item) {
+            item.deleted_user_id = this.$store.state.user.user.id;
+            item.deleted_at = new Date()
+                .toJSON()
+                .slice(0, 10)
+                .replace(/-/g, "/");
+            return axios.put("/post/delete", item).then((data) => {
+                console.log(data)
+                this.noti = data.data.data
+                this.$axios
+                    .get("/post/list")
+                    .then((response) => {
+                        this.userList = response.data;
+                        this.showList = this.userList;
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
             });
         },
     },

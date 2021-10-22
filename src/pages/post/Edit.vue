@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <h1 class="header">Create Post</h1>
+    <h1 class="header">Edit Post</h1>
     <v-form
       ref="form"
       v-model="valid"
-      @submit.prevent="createPost"
+      @submit.prevent="editPost"
       lazy-validation
     >
       <v-card class="mx-auto px-14 py-8 card">
-          <div v-if="this.$store.state.posterror" class="errMsg">
-             Title {{this.$store.state.posterror.title[0]}}
-          </div>
+          <div v-if="this.$store.state.error" class="errMsg">
+            Title {{this.$store.state.error.title[0]}}
+        </div>
         <v-text-field
           v-model="posts.title"
           :counter="255"
@@ -27,8 +27,18 @@
           class="mt-5"
           :rules="descriptRules"
         ></v-textarea>
-      </v-card>
 
+        <template>
+          <v-container class="px-0" fluid>
+            <v-switch
+            color="success"
+              v-model="switch1"
+              :label="`Status`"
+            ></v-switch>
+          </v-container>
+        </template>
+      </v-card>
+        
       <div class="btn">
         <v-btn color="error" class="mr-4" @click="clear">
           Clear
@@ -41,7 +51,7 @@
           class="mr-4"
           style="color: white"
         >
-          Create
+          Edit
         </v-btn>
       </div>
     </v-form>
@@ -51,10 +61,10 @@
 <script>
 import constant from "../../constants";
 import { mapGetters } from "vuex";
+import axios from "axios";
 export default {
   data: () => ({
     valid: true,
-    modal: false,
     posts: {
       title: "",
       description: "",
@@ -64,6 +74,7 @@ export default {
       delete_user_id: "",
       deleted_at: "",
     },
+    switch1: true,
     titleRules: [
       (v) => !!v == constant.VALIDATION.TITLE.REQUIRE || "Title is required",
       (v) =>
@@ -79,12 +90,20 @@ export default {
   computed: {
     ...mapGetters(["userId", "userType", "userName"]),
   },
-  created() {
-    console.log(this.$store.state.posts);
-    if (this.$store.state.posts) {
-      this.posts = this.$store.state.posts;
+  beforeCreate() {
+    axios
+      .get(`/post/detail?id=${this.$route.params.id}`)
+      .then((data) => {
+        this.posts = data.data;
+        if (this.posts.status===0) {
+        this.switch1 = false
     }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
+
   methods: {
     validate() {
       this.$refs.form.validate();
@@ -95,12 +114,15 @@ export default {
         description: "",
       };
     },
-    createPost() {
-      this.posts.create_user_id = this.userId;
-      this.posts.update_user_id = this.userId;
-      this.posts.status = 1;
-      this.$store.dispatch("confirmPost", this.posts)
-    },
+    editPost(){
+        if (this.switch1==false) {
+            this.posts.status = 0
+        }else{
+            this.posts.status = 1
+        }
+        this.posts.update_user_id = this.userId;
+        this.$store.dispatch("editPost",this.posts)
+    }
   },
   beforeDestroy(){
       this.$store.dispatch("clearError")
@@ -108,7 +130,7 @@ export default {
 };
 </script>
 
-<style scopped>
+<style scoped>
 .errMsg {
   color: red;
 }

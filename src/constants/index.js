@@ -26,6 +26,13 @@ const constants = {
         PROFILE: {
             REQUIRE: true,
             MAX: 2048 * 2048
+        },
+        TITLE: {
+            REQUIRE: true,
+            MAX: 255,
+        },
+        DESCRIPT: {
+            REQUIRE: true,
         }
     }
 };
