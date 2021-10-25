@@ -48,6 +48,7 @@ export default {
                 return this.headerList;
             }
         },
+
     },
     mounted() {
         this.$axios
@@ -99,5 +100,36 @@ export default {
                     });
             });
         },
+        download() {
+            this.$axios.get("/post/download").then((data) => {
+                const data1 = data.data
+                const csvData = objectToCsv(data1);
+                download(csvData)
+            })
+            const objectToCsv = function(data1) {
+                const csvRows = [];
+                const headers = Object.keys(data1[0]);
+                csvRows.push(headers.join(','));
+                for (const row of data1) {
+                    const values = headers.map(header => {
+                        const escaped = ('' + row[header]).replace(/"/g, '\\"');
+                        return `"${escaped}"`;
+                    });
+                    csvRows.push(values.join(','));
+                }
+                return csvRows.join('\n');
+            }
+            const download = function(data1) {
+                const blob = new Blob([data1], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', 'download.csv');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+        }
     },
 };

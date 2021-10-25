@@ -9,6 +9,7 @@ import Profile_edit from "../pages/user/Profile_edit";
 import Post_Create from "../pages/post/Create";
 import Post_Confirm from "../pages/post/Confirm";
 import Confirm_Edit from "../pages/post/EditConfirm";
+import Upload from "../pages/post/Upload";
 import Post_Edit from "../pages/post/Edit";
 import List from "../pages/user/List";
 import PostList from "../pages/post/PostList";
@@ -72,6 +73,11 @@ const routes = [{
         component: Confirm_Edit,
     },
     {
+        path: "/upload",
+        name: "upload",
+        component: Upload,
+    },
+    {
         path: "/*",
         redirect: "/post/list",
     },
@@ -87,7 +93,7 @@ const router = new VueRouter({
  */
 router.beforeEach((to, from, next) => {
     const loggedIn = store.getters.isLoggedIn;
-    if (!loggedIn && to.name != "post-confirm" && to.name != "confirm-edit" && to.name != "post-edit" && to.name != "login" && to.name != "post-list" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile" && to.name != "post-create") {
+    if (!loggedIn && to.name != "post-confirm" && to.name != "upload" && to.name != "confirm-edit" && to.name != "post-edit" && to.name != "login" && to.name != "post-list" && to.name != "create" && to.name != "list" && to.name != "confirm" && to.name != "profile" && to.name != "post-create") {
         return next("/login");
     }
     next();

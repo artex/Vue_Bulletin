@@ -26,8 +26,12 @@
               >Create</router-link
             >
           </v-btn>
-          <v-btn class="post-list-btn mr-4" color="primary">Upload</v-btn>
-          <v-btn class="post-list-btn mr-4" color="primary">Download</v-btn>
+          <v-btn class="post-list-btn mr-4" color="primary">
+            <router-link :to="{ name: 'upload' }" class="link"
+              >Upload</router-link
+            >
+          </v-btn>
+          <v-btn class="post-list-btn mr-4" color="primary" @click="download">Download</v-btn>
         </v-row>
       </v-form>
     </v-card-title>

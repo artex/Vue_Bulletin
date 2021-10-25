@@ -33,6 +33,9 @@ const constants = {
         },
         DESCRIPT: {
             REQUIRE: true,
+        },
+        CSV: {
+            REQUIRE: true,
         }
     }
 };
