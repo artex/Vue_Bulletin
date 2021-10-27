@@ -20,18 +20,18 @@
               hide-details="auto"
             ></v-text-field>
           </v-col>
-          <v-btn type="submit" class="post-list-btn mr-4" color="primary">Search</v-btn>
-          <v-btn class="post-list-btn mr-4" color="primary">
+          <v-btn type="submit" class="post-list-btn mr-4" color="#198754" style="color: white">Search</v-btn>
+          <v-btn class="post-list-btn mr-4" color="#198754" style="color: white">
             <router-link :to="{ name: 'post-create' }" class="link"
               >Create</router-link
             >
           </v-btn>
-          <v-btn class="post-list-btn mr-4" color="primary">
+          <v-btn class="post-list-btn mr-4" color="#198754" style="color: white">
             <router-link :to="{ name: 'upload' }" class="link"
               >Upload</router-link
             >
           </v-btn>
-          <v-btn class="post-list-btn mr-4" color="primary" @click="download">Download</v-btn>
+          <v-btn class="post-list-btn mr-4" color="#198754" style="color: white" @click="download">Download</v-btn>
         </v-row>
       </v-form>
     </v-card-title>
@@ -97,7 +97,7 @@
               <template>
                 <v-row justify="space-around">
                   <v-btn
-                    color="#2B81D6"
+                    color="#198754"
                     class="post-list-btn"
                     style="color: white"
                   >

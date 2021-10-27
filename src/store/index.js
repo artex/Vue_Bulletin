@@ -19,11 +19,20 @@ export default new Vuex.Store({
         postnoti: "",
         editpost: null,
         error: null,
-        posterror: null
+        posterror: null,
+        pwnoti: "",
+        pwsuccess: "",
+        forgotnoti: "",
+        forgotnoti2: "",
+        pwsetnoti: "",
+        loginnoti: "",
     },
     mutations: {
         setUserData(state, userData) {
             state.user = userData;
+        },
+        setUserData3(state, userData) {
+            state.user = userData.data;
         },
         setUserData1(state, userData) {
             state.user.user.role = userData;
@@ -60,6 +69,24 @@ export default new Vuex.Store({
         },
         posterror(state, error) {
             state.posterror = error
+        },
+        pwnoti(state, pwnoti) {
+            state.pwnoti = pwnoti
+        },
+        pwsuccess(state, pwsuccess) {
+            state.pwsuccess = pwsuccess
+        },
+        forgotnoti(state, forgot) {
+            state.forgotnoti = forgot
+        },
+        forgotnoti2(state, forgot) {
+            state.forgotnoti2 = forgot
+        },
+        pwsetnoti(state, pwsetnoti) {
+            state.pwsetnoti = pwsetnoti
+        },
+        loginnoti(state, loginnoti) {
+            state.loginnoti = loginnoti
         }
     },
     actions: {
@@ -93,8 +120,11 @@ export default new Vuex.Store({
         login({ commit }, credentials) {
             return axios.post("/auth/login", credentials).then(({ data }) => {
                 commit("setUserData", data);
-                console.log(data)
-            });
+                router.push({ name: "post-list" });
+
+            }).catch((error) => {
+                commit("loginnoti", error.response.data)
+            })
         },
         logout({ commit }) {
             commit("setUserData", null);
@@ -105,9 +135,16 @@ export default new Vuex.Store({
         },
         cancelAlert({ commit }) {
             commit("notification", null)
+            commit("forgotnoti", null)
+            commit("forgotnoti2", null)
+            commit("pwsetnoti", null)
+            commit("loginnoti", null)
         },
         cancelAlert2({ commit }) {
             commit("editnoti", null)
+        },
+        pwAlert({ commit }) {
+            commit("pwnoti", null)
         },
         confirmPost({ commit }, postsData) {
             return axios.post("/post/confirm", postsData).then(() => {
@@ -148,10 +185,49 @@ export default new Vuex.Store({
                 commit("editPost", null)
                 router.push({ name: "post-list" })
             })
+        },
+        updatePassword({ commit }, newpwData) {
+            return axios.put("/user/pwupdate", newpwData).then(() => {
+                this.state.user.user.password = newpwData.new
+                return axios.put("/user/pwupdated", this.state.user.user).then((data) => {
+                    commit("setUserData3", data);
+                    commit("pwsuccess", data.data.noti);
+                    router.push({ name: "list" })
+                })
+            }).catch((error) => {
+                commit("pwnoti", error.response.data)
+            })
+        },
+        pwsuccessAleart({ commit }) {
+            commit("pwsuccess", null);
+        },
+        resetPassword({ commit }, reset) {
+            return axios.post("/user/reset", reset).then((data) => {
+                console.log(data)
+                commit("forgotnoti", data);
+                router.push({ name: "login" })
+                return axios.post("/reset/create", {
+                    email: data.data.email,
+                    token: data.data.token
+                }).then((data) => {
+                    console.log(data)
+                })
+            }).catch((error) => {
+                console.log(error.response.data)
+                commit("forgotnoti2", error.response.data);
+            })
+        },
+        pwsetnoti({ commit }, noti) {
+            commit("pwsetnoti", noti)
         }
     },
     getters: {
         isLoggedIn: (state) => !!state.user,
+        userInfo: (state) => {
+            if (state.user) {
+                return state.user.user;
+            }
+        },
         userType: (state) => {
             if (state.user) {
                 return state.user.user.role;

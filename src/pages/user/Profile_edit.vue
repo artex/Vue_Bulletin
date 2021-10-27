@@ -79,7 +79,7 @@
           label="Address"
           auto-grow
         ></v-textarea>
-        <div>
+        <div v-if="this.invi == false">
           <img
             v-if="this.image"
             :src="this.image"
@@ -96,7 +96,7 @@
       </v-card>
 
       <div class="btn">
-        <v-btn color="error" class="mr-4" >
+        <v-btn color="error" class="mr-4" @click="clear">
           Clear
         </v-btn>
         <v-btn
@@ -109,6 +109,9 @@
         >
           Edit
         </v-btn>
+        <router-link :to="{ name: 'pwchange' }" class="link"
+              >Change Password</router-link
+            >
       </div>
     </v-form>
   </div>
@@ -137,6 +140,7 @@ export default {
       deleted_user_id: "",
       deleted_at: "",
     },
+    invi: false,
     profile: null,
     image: null,
     confirm: "",
@@ -233,7 +237,23 @@ export default {
           })
       }
     },
-
+    clear(){
+      this.users = {
+      name: "",
+      email: "",
+      password: "",
+      role: null,
+      phone: "",
+      dob: "",
+      address: "",
+      profile: null,
+      create_user_id: "",
+      update_user_id: "",
+      deleted_user_id: "",
+      deleted_at: "",
+      },
+      this.invi = true
+    },
     validate() {
       this.$refs.form.validate();
     },

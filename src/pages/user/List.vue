@@ -13,6 +13,10 @@
       {{ this.noti }}
       <button class="cross-btn" @click="cancelAlert3">X</button>
     </v-alert>
+    <v-alert v-if="this.$store.state.pwsuccess" type="success">
+      {{ this.$store.state.pwsuccess }}
+      <button class="cross-btn" @click="cancelAlert4">X</button>
+    </v-alert>
     <v-card-title>
       <v-spacer></v-spacer>
       <v-form ref="form" @submit.prevent="filtername">
@@ -33,7 +37,7 @@
             >
             </v-text-field>
           </v-col>
-          <v-btn type="submit" class="post-list-btn mr-4" color="primary">Search</v-btn>
+          <v-btn type="submit" class="post-list-btn mr-4" color="#198754" style="color: white">Search</v-btn>
         </v-row>
       </v-form>
     </v-card-title>
@@ -317,6 +321,7 @@ export default {
       .catch((err) => {
         console.log(err);
       });
+      console.log(this.$store.state)
   },
   methods: {
     getImage(iddata) {
@@ -338,6 +343,10 @@ export default {
     cancelAlert2() {
       this.$store.state.editnoti = false;
       this.$store.dispatch("cancelAlert2");
+    },
+    cancelAlert4() {
+      this.$store.state.editnoti = false;
+      this.$store.dispatch("pwsuccessAleart");
     },
     cancelAlert3() {
       this.noti = null;

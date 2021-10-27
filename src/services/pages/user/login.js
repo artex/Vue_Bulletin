@@ -25,14 +25,12 @@ export default {
                     email: this.email,
                     password: this.password
                 })
-                .then(() => {
-                    this.error = "";
-                    this.$router.push({ name: "post-list" });
-                })
-                .catch(err => {
-                    this.error = err.response.data.errors.message;
-                    console.log(err);
-                });
+        },
+        cancelAlert() {
+            this.$store.dispatch("cancelAlert")
         }
+    },
+    beforeDestroy() {
+        this.$store.dispatch("cancelAlert")
     }
 };
