@@ -7,8 +7,14 @@
     height: 70px;
 }
 
-.login-action {
-    margin: 0px 7px 7px 7px;
+.v-card__actions {
+    display: block;
+}
+
+.login {
+    width: 100%;
+    margin: 0 auto;
+    color: white;
 }
 
 .login-error {
@@ -22,6 +28,17 @@
     text-decoration: none;
     padding-left: 20px;
     font-size: 15px;
+    display: block;
+    float: right;
+    padding-right: 10px;
+    margin-top: 5px;
+}
+
+.checkbox {
+    display: block;
+    float: left;
+    margin: 0;
+    padding-left: 0px;
 }
 
 .card {

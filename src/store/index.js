@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 import createPersistedState from "vuex-persistedstate";
-
+import cookie from "vue-cookie"
 Vue.use(Vuex);
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER;
@@ -26,6 +26,7 @@ export default new Vuex.Store({
         forgotnoti2: "",
         pwsetnoti: "",
         loginnoti: "",
+        remember: false,
     },
     mutations: {
         setUserData(state, userData) {
@@ -87,6 +88,12 @@ export default new Vuex.Store({
         },
         loginnoti(state, loginnoti) {
             state.loginnoti = loginnoti
+        },
+        remember(state, remember) {
+            state.remember = remember
+        },
+        autologout(state, token) {
+            state.user.token = token
         }
     },
     actions: {
@@ -118,7 +125,13 @@ export default new Vuex.Store({
 
         },
         login({ commit }, credentials) {
+            commit("remember", credentials.remember)
             return axios.post("/auth/login", credentials).then(({ data }) => {
+                if (credentials.remember == false) {
+                    cookie.set("token", data.token)
+                } else {
+                    cookie.set("token", data.token, { expires: '1Y' })
+                }
                 commit("setUserData", data);
                 router.push({ name: "post-list" });
 
@@ -219,6 +232,9 @@ export default new Vuex.Store({
         },
         pwsetnoti({ commit }, noti) {
             commit("pwsetnoti", noti)
+        },
+        autologout({ commit }, token) {
+            commit("autologout", token)
         }
     },
     getters: {

@@ -6,7 +6,8 @@ import store from "./store";
 import axios from "axios";
 import moment from "moment";
 import vuetify from "./plugins/vuetify";
-
+var VueCookie = require('vue-cookie');
+Vue.use(VueCookie);
 Vue.config.productionTip = false;
 Vue.prototype.$axios = axios;
 Vue.prototype.$store = store;

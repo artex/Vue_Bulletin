@@ -114,13 +114,6 @@
                       max-width="600"
                     >
                       <template v-slot:activator="{ on, attrs }">
-                        <!-- <btn
-                            color="primary"
-                            v-bind="attrs"
-                            v-on="on"
-                            @click="getImage(item.id)"
-                            >{{ item.name }}</btn
-                          > -->
                         <v-btn
                           v-bind="attrs"
                           v-on="on"

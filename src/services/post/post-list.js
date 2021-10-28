@@ -51,15 +51,41 @@ export default {
 
     },
     mounted() {
-        this.$axios
-            .get("/post/list")
-            .then((response) => {
-                this.postList = response.data;
-                this.showList = this.postList;
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        if (this.$store.state.user) {
+            if (this.$store.state.user.user.role == 0) {
+                this.$axios
+                    .get("/post/list")
+                    .then((response) => {
+                        this.postList = response.data;
+                        this.showList = this.postList;
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                this.$axios
+                    .post("/post/list/user", { id: this.$store.state.user.user.id })
+                    .then((response) => {
+                        this.postList = response.data;
+                        this.showList = this.postList;
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+        } else {
+            this.$axios
+                .get("/post/list")
+                .then((response) => {
+                    this.postList = response.data;
+                    this.showList = this.postList;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+
+
     },
     methods: {
         /**

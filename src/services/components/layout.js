@@ -1,6 +1,6 @@
 import { mapGetters } from "vuex";
 import constants from "../../constants";
-
+import cookie from "vue-cookie"
 export default {
     data() {
         return {
@@ -33,4 +33,12 @@ export default {
             this.$router.push({ name: "profile" })
         },
     },
+    beforeCreate() {
+        const token = cookie.get("token")
+        if (token == null) {
+            this.$store.dispatch("logout")
+
+        }
+
+    }
 };

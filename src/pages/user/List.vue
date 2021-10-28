@@ -9,7 +9,7 @@
       {{ this.$store.state.editnoti.data.data }}
       <button class="cross-btn" @click="cancelAlert2">X</button>
     </v-alert>
-    <v-alert v-if="this.noti!=null" type="success">
+    <v-alert v-if="this.noti != null" type="success">
       {{ this.noti }}
       <button class="cross-btn" @click="cancelAlert3">X</button>
     </v-alert>
@@ -21,23 +21,86 @@
       <v-spacer></v-spacer>
       <v-form ref="form" @submit.prevent="filtername">
         <v-row class="filter-bar">
-          <v-col md="2.5">
-            <v-text-field
-              label="Name"
-              v-model="keyword"
-              hide-details="auto"
+          <v-text-field
+            label="Name"
+            v-model="keyword"
+            hide-details="auto"
+            class="mr-5"
+          >
+          </v-text-field>
+
+          <v-text-field label="Email" v-model="ekeyword" hide-details="auto">
+          </v-text-field>
+
+          <div>
+            <v-dialog
+              ref="dialog"
+              v-model="modal"
+              :return-value.sync="date"
+              persistent
+              width="290px"
             >
-            </v-text-field>
-          </v-col>
-          <v-col md="2.5">
-            <v-text-field
-              label="Email"
-              v-model="ekeyword"
-              hide-details="auto"
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="startDate"
+                  label="From"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="startDate" scrollable>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="modal = false">
+                  Cancel
+                </v-btn>
+                <v-btn text color="primary" @click="$refs.dialog.save(date)">
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </div>
+          <div>
+            <v-dialog
+              ref="dialog2"
+              v-model="modal2"
+              :return-value.sync="date2"
+              persistent
+              width="290px"
             >
-            </v-text-field>
-          </v-col>
-          <v-btn type="submit" class="post-list-btn mr-4" color="#198754" style="color: white">Search</v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="endDate"
+                  label="To"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="endDate" scrollable>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="(modal2 = false), ($refs.dialog2.date2 = null)"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn text color="primary" @click="$refs.dialog2.save(date2)">
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </div>
+          <v-btn
+            type="submit"
+            class="post-list-btn mr-4"
+            color="#198754"
+            style="color: white"
+            >Search</v-btn
+          >
         </v-row>
       </v-form>
     </v-card-title>
@@ -160,7 +223,9 @@
                             <v-toolbar color="primary" dark
                               >Delete Confirm</v-toolbar
                             >
-                            <div style="color: red; margin: 20px; font-size:20px">
+                            <div
+                              style="color: red; margin: 20px; font-size:20px"
+                            >
                               Are you sure to delete user?
                             </div>
                             <v-card-text class="clearFix">
@@ -271,6 +336,12 @@ export default {
           value: "operation",
         },
       ],
+      modal: false,
+      modal2: false,
+      startDate: null,
+      endDate: null,
+      date: "",
+      date2: "",
       userList: [],
       showList: [],
       users: {
@@ -312,16 +383,48 @@ export default {
     },
   },
   mounted() {
-    this.$axios
-      .get("/user/list")
-      .then((response) => {
-        this.userList = response.data;
-        this.showList = this.userList;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-      console.log(this.$store.state)
+    // this.$axios
+    //   .get("/user/list")
+    //   .then((response) => {
+    //     this.userList = response.data;
+    //     this.showList = this.userList;
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    if (this.$store.state.user) {
+            if (this.$store.state.user.user.role == 0) {
+                this.$axios
+                    .get("/user/list")
+                    .then((response) => {
+                        this.postList = response.data;
+                        this.showList = this.postList;
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                this.$axios
+                    .post("/user/list/user", { id: this.$store.state.user.user.id })
+                    .then((response) => {
+                        this.postList = response.data;
+                        this.showList = this.postList;
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+        } else {
+            this.$axios
+                .get("/user/list")
+                .then((response) => {
+                    this.postList = response.data;
+                    this.showList = this.postList;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
   },
   methods: {
     getImage(iddata) {
@@ -353,10 +456,19 @@ export default {
     },
     filtername() {
       this.showList = this.userList.filter((user) => {
-        return (
-          user.name.includes(this.keyword)||
-          user.email.includes(this.ekeyword)
+        if (!this.keyword) {
+          return (
+            user.created_at >= this.startDate && user.created_at <= this.endDate
+          );
+        }else{
+          return (
+          user.name.includes(this.keyword) &&
+          user.email.includes(this.ekeyword) &&
+          user.created_at >= this.startDate &&
+          user.created_at <= this.endDate
         );
+        }
+        
       });
     },
 
@@ -367,7 +479,7 @@ export default {
         .slice(0, 10)
         .replace(/-/g, "/");
       return axios.put("/user/delete", item).then((data) => {
-        this.noti = data.data.data
+        this.noti = data.data.data;
         this.$axios
           .get("/user/list")
           .then((response) => {

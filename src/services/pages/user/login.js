@@ -4,6 +4,7 @@ export default {
         email: "",
         password: "",
         error: "",
+        remember: false,
 
         // validation rules for user email.
         emailRules: [
@@ -23,7 +24,8 @@ export default {
             this.$store
                 .dispatch("login", {
                     email: this.email,
-                    password: this.password
+                    password: this.password,
+                    remember: this.remember
                 })
         },
         cancelAlert() {

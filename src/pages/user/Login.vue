@@ -36,16 +36,27 @@
             hide-details="auto"
           ></v-text-field>
         </div>
-      </v-card-text>
-      <v-card-actions>
-        <div class="login-action">
-          <v-spacer></v-spacer>
-          <v-btn type="submit" :disabled="!valid" large color="#198754" style="color: white"
-            >Login</v-btn
-          >
+
+        <v-checkbox
+          v-model="remember"
+              label="Remember me"
+              color="success"
+              hide-details
+              class="checkbox"
+            ></v-checkbox>
           <router-link :to="{ name: 'forget' }" class="link"
             >Forgoteen Password?</router-link
           >
+      </v-card-text>
+      
+      <v-card-actions style="display: 0">
+        <div class="login-action mt-5">
+          <v-spacer></v-spacer>
+
+          <v-btn type="submit" :disabled="!valid" large color="#198754" class="login"
+            >Login</v-btn
+          >
+          
         </div>
       </v-card-actions>
     </v-form>
